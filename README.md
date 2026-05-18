@@ -182,3 +182,9 @@ Open [http://localhost:3000](http://localhost:3000) to view your local AI Influe
 ## 🛡️ License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<p align="center">
+  🏆 Built with passion by <a href="https://github.com/shrutisania11">Shruti Sania</a>
+</p>
