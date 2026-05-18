@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>AI Influencer Generator & Scheduler - Technical Manual</title>
+  <style>
+    /* CSS Styling optimized for both Screen Viewing and PDF Printing */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --primary-color: #4F46E5;
+      --secondary-color: #06B6D4;
+      --dark-color: #0F172A;
+      --light-bg: #F8FAFC;
+      --border-color: #E2E8F0;
+      --text-main: #334155;
+      --text-muted: #64748B;
+      --code-bg: #F1F5F9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-main);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background-color: #FFFFFF;
+    }
+
+    /* Print Page Layout & Geometry */
+    @page {
+      size: A4;
+      margin: 20mm 15mm 20mm 15mm;
+    }
+
+    @media print {
+      body {
+        background-color: #FFFFFF;
+        font-size: 11pt;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+
+      pre,
+      code {
+        background-color: #FAFAFA !important;
+        border: 1px solid #E5E5E5 !important;
+        font-size: 9pt !important;
+      }
+
+      a {
+        text-decoration: none;
+        color: var(--primary-color);
+      }
+
+      .no-print {
+        display: none;
+      }
+
+      footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        font-size: 8pt;
+        color: var(--text-muted);
+        text-align: center;
+        border-top: 1px solid var(--border-color);
+        padding-top: 5px;
+      }
+    }
+
+    /* Cover Page Styling */
+    .cover-page {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px;
+      border-right: 15px solid var(--primary-color);
+      background-color: var(--light-bg);
+      page-break-after: always;
+    }
+
+    .cover-tag {
+      font-size: 14px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+
+    .cover-title {
+      font-size: 44px;
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--dark-color);
+      margin: 0 0 20px 0;
+    }
+
+    .cover-subtitle {
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-bottom: 50px;
+      max-width: 600px;
+    }
+
+    .cover-metadata {
+      margin-top: auto;
+      border-top: 2px solid var(--border-color);
+      padding-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .meta-item label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+
+    .meta-item span {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--dark-color);
+    }
+
+    /* Document Structure */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      color: var(--dark-color);
+      font-weight: 700;
+    }
+
+    h1 {
+      font-size: 26px;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 8px;
+      margin-top: 40px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 20px;
+      color: var(--primary-color);
+      margin-top: 30px;
+      margin-bottom: 15px;
+      border-bottom: 1px dashed var(--border-color);
+      padding-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    p {
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+
+    ul,
+    ol {
+      margin-bottom: 20px;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    /* Code Blocks */
+    pre {
+      background-color: var(--light-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 15px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 20px 0;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background-color: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #D97706;
+    }
+
+    pre code {
+      background-color: transparent;
+      padding: 0;
+      color: var(--text-main);
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 25px 0;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--border-color);
+      padding: 12px 15px;
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--light-bg);
+      font-weight: 600;
+      color: var(--dark-color);
+    }
+
+    tr:nth-child(even) {
+      background-color: #F8FAFC;
+    }
+
+    /* Callout Boxes */
+    .callout {
+      background-color: #EEF2FF;
+      border-left: 4px solid var(--primary-color);
+      padding: 15px;
+      border-radius: 0 6px 6px 0;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+
+    .callout-warning {
+      background-color: #FFFBEB;
+      border-left: 4px solid #F59E0B;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      color: var(--dark-color);
+      margin-bottom: 5px;
+    }
+
+    /* Floating Web Navigation Alert */
+    .no-print-banner {
+      background-color: var(--dark-color);
+      color: #FFFFFF;
+      padding: 12px;
+      text-align: center;
+      font-size: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .no-print-banner a {
+      color: var(--secondary-color);
+      text-decoration: underline;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Floating Web Navigation Alert -->
+  <div class="no-print-banner no-print">
+    📄 <strong>PDF Ready!</strong> Press <strong>Ctrl + P</strong> (Windows) or <strong>Cmd + P</strong> (Mac) and set
+    your Destination to <strong>"Save as PDF"</strong> to export this complete ebook manual beautifully!
+  </div>
+
+  <!-- COVER PAGE -->
+  <div class="cover-page">
+    <div class="cover-tag">Full-Stack SaaS Architecture Manual</div>
+    <h1 class="cover-title">AI Influencer Generator &amp;<br>Auto Post Scheduler</h1>
+    <p class="cover-subtitle">
+      A comprehensive production guide detailing subsystems, secure pipelines, database modeling, external API
+      frameworks, and DevOps operations from starting to end.
+    </p>
+
+    <div class="cover-metadata">
+      <div class="meta-item">
+        <label>Author / Owner</label>
+        <span>Shruti Sania</span>
+      </div>
+      <div class="meta-item">
+        <label>Current Release Tier</label>
+        <span>Production Release v1.0.0</span>
+      </div>
+      <div class="meta-item">
+        <label>Primary Stack</label>
+        <span>Next.js 16 | Supabase | Stripe | Zernio</span>
+      </div>
+      <div class="meta-item">
+        <label>Published On</label>
+        <span>May 18, 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTAINER FOR MAIN CONTENT -->
+  <div class="container">
+
+    <!-- CHAPTER 1 -->
+    <h1 class="page-break">1. Platform Overview &amp; Design Philosophy</h1>
+    <p>
+      The <strong>AI Influencer Generator &amp; Auto Post Scheduler</strong> is a state-of-the-art software-as-a-service
+      (SaaS) application engineered to empower content creators, digital marketers, and agencies to construct custom
+      synthetic personas (AI Influencers) and automate their presence across key global social networks.
+    </p>
+    <p>
+      Unlike traditional post scheduling queues, this platform integrates generative media directly into the scheduler.
+      Content creators do not simply schedule text or pre-made pictures; they construct a multi-dimensional digital
+      model that is represented in the database as a visual identity. The system maintains visual consistency across
+      posts by compiling visual character parameters, generating appropriate custom campaign graphics, drafting
+      optimized social media captions, and queuing them to real accounts.
+    </p>
+
+    <h2>1.1 Core Architecture Principles</h2>
+    <ul>
+      <li><strong>Consistent Identity Rendering</strong>: Generates portraits and full-body model variations using
+        precise generative descriptions, bypassing identity drifting between individual renders.</li>
+      <li><strong>Strict Resource Tokenomics</strong>: Incorporates credit-based quotas (50 credits for character
+        design, 20 credits for post generation) verifying balances prior to billing external APIs.</li>
+      <li><strong>Robust Schema Agnosticism</strong>: Implements deep-level try-catch models and sandboxed fallbacks so
+        that database updates or missing API integrations never break the dashboard experience.</li>
+      <li><strong>Intuitive Client Dashboards</strong>: Implements sleek, responsive visual indicators, hover states,
+        drag-and-drop calendar queues, and inline subscription simulations.</li>
+    </ul>
+
+    <!-- CHAPTER 2 -->
+    <h1>2. The Core Technical Stack</h1>
+    <p>
+      The platform features a modular, modern developer environment chosen for high performance, ease of deployment, and
+      modern standards:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Subsystem</th>
+          <th>Technology Choice</th>
+          <th>Architectural Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Client &amp; Server Core</strong></td>
+          <td>Next.js 16 (App Router) &amp; React 19</td>
+          <td>Server-Side Rendering, Server Actions, and high-performance hydrates.</td>
+        </tr>
+        <tr>
+          <td><strong>Database &amp; Storage</strong></td>
+          <td>Supabase (PostgreSQL &amp; S3 Storage)</td>
+          <td>Session authorization, real-time relational tables, and hosted media storage.</td>
+        </tr>
+        <tr>
+          <td><strong>AI Media Engine</strong></td>
+          <td>Fal.ai (API client), Hugging Face, Luma Agents</td>
+          <td>Consistent-character image generation pipelines and video synthesis.</td>
+        </tr>
+        <tr>
+          <td><strong>SaaS Monetization</strong></td>
+          <td>Stripe API (Dynamic Price Passing)</td>
+          <td>Inline checkout pages, asynchronous webhooks, and sandbox payments.</td>
+        </tr>
+        <tr>
+          <td><strong>Social Scheduling</strong></td>
+          <td>Zernio API (Unified Multi-Platform Gateway)</td>
+          <td>OAuth account linkage, media presigning, and immediate/delayed posting.</td>
+        </tr>
+        <tr>
+          <td><strong>Styling UI/UX</strong></td>
+          <td>Tailwind CSS v4 &amp; Glassmorphism CSS</td>
+          <td>Harmonious dark-mode UI with blur filters, responsive widgets, and grids.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">💡 Developer Note: React 19 Hydration Compliance</div>
+      React 19 strict typing requires components like calendars and sidebars to be highly resilient against mismatched
+      client-server hydration states. The platform uses explicit React hooks and CSS loaders to keep pages loading
+      flawlessly.
+    </div>
+
+    <!-- CHAPTER 3 -->
+    <h1 class="page-break">3. Comprehensive Database Schema (SQL)</h1>
+    <p>
+      The data system is managed using <strong>Supabase (PostgreSQL)</strong>. The structural links are governed by
+      CASCADE constraints ensuring data integrity. If a user deletes their account, all related custom models, campaign
+      posts, and social tokens are cleaned up securely.
+    </p>
+
+    <h2>3.1 Complete SQL Table Setup</h2>
+    <p>
+      Execute the following SQL instructions inside your Supabase SQL Editor to establish the relational schemas:
+    </p>
+
+    <pre><code>-- 1. USERS TABLE
+CREATE TABLE public.users (
+    id UUID PRIMARY KEY REFERENCES auth.users ON DELETE CASCADE,
+    email TEXT,
+    full_name TEXT,
+    avatar_url TEXT,
+    credits INTEGER DEFAULT 300,                  -- Entered on standard free tier registration
+    subscription_tier TEXT DEFAULT 'free',        -- 'free', 'standard', 'pro'
+    subscription_status TEXT DEFAULT 'inactive',  -- 'active', 'inactive', 'canceled'
+    stripe_customer_id TEXT,
+    stripe_subscription_id TEXT,
+    updated_at TIMESTAMP WITH TIME ZONE
+);
+
+-- 2. MODELS TABLE (AI INFLUENCERS)
+CREATE TABLE public.models (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    gender TEXT,
+    body_type TEXT,
+    skin_tone TEXT,
+    age_range TEXT,
+    hair_style TEXT,
+    hair_color TEXT,
+    eye_color TEXT,
+    vibe TEXT,
+    prompt TEXT,
+    portrait_url TEXT,     -- Signed secure storage link
+    full_body_url TEXT,    -- Signed secure storage link
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 3. POSTS TABLE (GENERATED MEDIA CAMPAIGNS)
+CREATE TABLE public.posts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    model_id UUID REFERENCES public.models(id) ON DELETE CASCADE,
+    prompt TEXT NOT NULL,         -- JSON payload containing schedules, subtitles, and publish states
+    image_url TEXT,               -- Output CDN asset link
+    aspect_ratio TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 4. SOCIAL ACCOUNTS TABLE
+CREATE TABLE public.social_accounts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    platform TEXT NOT NULL,       -- 'instagram', 'linkedin', 'tiktok', 'youtube', 'pinterest'
+    profile_id TEXT NOT NULL,     -- Sync key generated from Zernio
+    account_id TEXT NOT NULL,     -- Unique platform channel identifier
+    account_name TEXT,
+    avatar_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    CONSTRAINT unique_user_platform_account UNIQUE (user_id, platform, account_id)
+);</code></pre>
+
+    <h2>3.2 Architectural Table Relationships</h2>
+    <p>
+      The architecture follows a strict 1-to-many cascading parent structure:
+    </p>
+    <ul>
+      <li>Every <code>public.models</code> and <code>public.posts</code> belongs directly to an authenticated
+        <code>public.users</code> primary key.</li>
+      <li>Each post generated belongs to a target <code>public.models</code> (AI Influencer), establishing visual
+        alignment.</li>
+      <li>The <code>unique_user_platform_account</code> constraint prevents users from linking the exact same Instagram
+        or LinkedIn channel multiple times, protecting token synchronization.</li>
+    </ul>
+
+    <!-- CHAPTER 4 -->
+    <h1 class="page-break">4. Backend API Pipelines &amp; Server Actions</h1>
+    <p>
+      The application utilizes Next.js Server Actions to securely process calculations on the server, avoiding exposing
+      sensitive API keys to the client.
+    </p>
+
+    <h2>4.1 AI Influencer Studio Generator</h2>
+    <p>
+      The generation file <code>app/actions/influencers.ts</code> orchestrates the avatar and full-body rendering
+      pipeline:
+    </p>
+    <ol>
+      <li><strong>Credit Auditing</strong>: Validates that the active user profile has at least <strong>50
+          credits</strong>. If not, it returns an early error response.</li>
+      <li><strong>Generative Synthesis</strong>: Formulates highly structured textual prompts based on the UI choices
+        and invokes the <code>@fal-ai/client</code>.</li>
+      <li><strong>Secure Storage Buffer</strong>: Downloads the binary image buffer from Fal.ai CDN and transfers it to
+        the Supabase Storage Bucket under <code>public/models/${userId}/${timestamp}.jpg</code>.</li>
+      <li><strong>Profile Refills &amp; DB Insertion</strong>: Deducts 50 credits, updates the user's table, and writes
+        the character parameters to the <code>models</code> table.</li>
+    </ol>
+
+    <h2>4.2 Zernio Unified Social OAuth Integrator</h2>
+    <p>
+      The social scheduler file <code>app/actions/social.ts</code> interfaces with the Zernio Social API:
+    </p>
+    <ul>
+      <li><strong>Profile Provisioning</strong>: Uses <code>getOrCreateZernioProfile</code> to map users to independent
+        Zernio nodes, securing profile integrity.</li>
+      <li><strong>Fallback Mock Linker</strong>: If a developer is working offline or hasn't configured a
+        <code>ZERNIO_API_KEY</code>, the server actions fallback to a robust <strong>Mock Linker Simulator</strong>.
+        This returns mock keys and logs active simulator badges, enabling the front-end features to run smoothly in
+        sandboxed sandboxes.</li>
+      <li><strong>Unified Post Publishing</strong>: Pushes scheduled assets to Zernio's CDN presigned bucket
+        (<code>/media/presign</code>), downloads the file streams, and executes publishing updates for scheduled times.
+      </li>
+    </ul>
+
+    <h2>4.3 Stripe Subscription Gateway</h2>
+    <p>
+      The payment pipeline in <code>app/actions/stripe.ts</code> features elegant developer shortcuts:
+    </p>
+    <pre><code>// Dynamic Stripe Product Checkout Configuration
+const session = await stripe.checkout.sessions.create({
+  payment_method_types: ['card'],
+  line_items: [{
+    price_data: {
+      currency: 'usd',
+      product_data: {
+        name: 'Pro Premium Monthly Plan',
+        description: '3000 monthly credits & unlimited multi-platform posting',
+      },
+      unit_amount: 4900, // $49.00 USD
+      recurring: { interval: 'month' }
+    },
+    quantity: 1,
+  }],
+  mode: 'subscription',
+  success_url: `${origin}/dashboard/settings?session_id={CHECKOUT_SESSION_ID}`,
+  cancel_url: `${origin}/dashboard/settings`,
+});</code></pre>
+    <p>
+      This inline method removes the overhead of manually pre-creating pricing items in the Stripe Dashboard, making
+      setup fast and fully dynamic.
+    </p>
+
+    <!-- CHAPTER 5 -->
+    <h1 class="page-break">5. Frontend UI/UX &amp; Interactive Calendar</h1>
+    <p>
+      The platform features a visually stunning visual layout styled with premium glassmorphism, responsive navigation,
+      and beautiful states.
+    </p>
+
+    <h2>5.1 Interactive Scheduling Calendar Dashboard</h2>
+    <p>
+      The core user dashboard features a drag-and-drop calendar scheduler that coordinates your publishing timeline:
+    </p>
+    <ul>
+      <li><strong>Draft Selector Dialog</strong>: Clicking on any empty day slot triggers a beautiful hover modal. Users
+        can inspect existing unpublished campaign drafts, edit the accompanying post description or scheduled publishing
+        hour, and save changes immediately.</li>
+      <li><strong>Aesthetic Hover Thumbnails</strong>: Moving the cursor over scheduled items instantly renders a
+        micro-animation previewing the visual graphic and platform indicators.</li>
+      <li><strong>Analytics Insight Panel</strong>: The calendar footer contains mathematical metrics analyzing
+        weekly/monthly scheduled items, distribution percentages (e.g., "Instagram: 40%, LinkedIn: 60%"), and warning
+        notifications for days with heavy queues.</li>
+    </ul>
+
+    <h2>5.2 Billing Dashboard &amp; Credit Simulator</h2>
+    <p>
+      The billing page (<code>app/dashboard/settings/page.tsx</code>) handles subscription configuration. If the
+      developer doesn't have an active Stripe integration, the page provides a <strong>Credit Card Checkout Simulator
+        Modal</strong>. Users can enter mock credentials, trigger a loading state, and safely credit their local
+      profiles with subscription balances without sending real network requests.
+    </p>
+
+    <!-- CHAPTER 6 -->
+    <h1 class="page-break">6. Operations, Setup &amp; Deployment Manual</h1>
+    <p>
+      Follow this complete operational guide to configure the application from scratch and deploy it to a live hosting
+      environment.
+    </p>
+
+    <h2>6.1 Local Installation Sequence</h2>
+    <p>
+      Run these terminal instructions in your workspace:
+    </p>
+    <pre><code># 1. Download project files
+git clone https://github.com/shrutisania11/ai-influencer-generator.git
+cd ai-influencer-generator
+
+# 2. Setup standard packages
+npm install
+
+# 3. Spin up hot-reloading development server
+npm run dev</code></pre>
+
+    <h2>6.2 System Environment Variables</h2>
+    <p>
+      Create a file in your project root named <code>.env.local</code> and populate the credentials:
+    </p>
+    <pre><code># ----------------------------------------------------
+# DATABASE CONFIGURATION (Supabase Dashboard Settings)
+# ----------------------------------------------------
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# ----------------------------------------------------
+# BILLING CONFIGURATION (Stripe Developer Dashboard)
+# ----------------------------------------------------
+STRIPE_SECRET_KEY=sk_test_51...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# ----------------------------------------------------
+# MEDIA ENGINES CONFIGURATION (Fal.ai Dashboard)
+# ----------------------------------------------------
+FAL_KEY=fal-key-string...
+
+# ----------------------------------------------------
+# SOCIAL CHANNEL GATEWAY CONFIGURATION (Zernio Console)
+# ----------------------------------------------------
+ZERNIO_API_KEY=zr_key_...</code></pre>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">⚠️ Security Protocol: API Key Exposure</div>
+      Never commit <code>.env.local</code> to GitHub. If you accidently upload your credentials, IMMEDIATELY navigate to
+      the respective developer console, delete the compromised secret, and request a replacement token.
+    </div>
+
+    <h2>6.3 Development Webhook Tunneling</h2>
+    <p>
+      Because Stripe utilizes asynchronous server callbacks to tell your database that a subscription payment was
+      successful, you must run a webhook listener in development:
+    </p>
+    <ol>
+      <li>Download and install the **Stripe CLI** on your computer.</li>
+      <li>Log in to your account: <code>stripe login</code></li>
+      <li>Start the event forwarding pipeline:
+        <pre><code>stripe listen --forward-to localhost:3000/api/webhooks/stripe</code></pre>
+      </li>
+      <li>Copy the returned webhook signing secret (starts with <code>whsec_</code>) and paste it as
+        <code>STRIPE_WEBHOOK_SECRET</code> in your local <code>.env.local</code> file.</li>
+    </ol>
+
+    <!-- CHAPTER 7 -->
+    <h1 class="page-break">7. Git CLI &amp; GitHub Profile Optimization Guide</h1>
+    <p>
+      Once the code is ready, presenting it in an organized, beautiful manner on GitHub is essential for proving your
+      full-stack engineering proficiency.
+    </p>
+
+    <h2>7.1 Complete Git Sync Procedures</h2>
+    <p>
+      If your local code gets out of sync with your remote GitHub repository (for example, if you edit or delete files
+      like <code>CLAUDE.md</code> on the web interface), you will receive a <em>"push rejected"</em> warning. Follow
+      this precise sequence to synchronize and publish your changes safely:
+    </p>
+    <pre><code># 1. Stage your local changes
+git add .
+
+# 2. Create a clean commit message
+git commit -m "docs: polish README and add author credit"
+
+# 3. Pull and integrate remote web updates (keeps history aligned)
+git pull origin main --rebase
+
+# 4. Push local changes back to GitHub securely
+git push origin main</code></pre>
+
+    <h2>7.2 Repository Optimization Protocol</h2>
+    <ul>
+      <li><strong>Interactive Description</strong>: Populate the repository's "About" section with an active description
+        and link to your live Vercel landing page.</li>
+      <li><strong>Targeted Topic Tags</strong>: Add discoverability tags including <code>nextjs</code>,
+        <code>supabase</code>, <code>stripe</code>, <code>generative-ai</code>, and <code>saas</code>.</li>
+      <li><strong>Profile Pinning</strong>: Pin the repository at the top of your GitHub homepage, so it is the primary
+        item recruiters see.</li>
+    </ul>
+
+  </div>
+
+  <!-- Print-Only Page Footer -->
+  <footer class="no-print">
+    AI Influencer Generator &amp; Auto Post Scheduler - System Documentation Manual
+  </footer>
+
+</body>
+
+</html>
