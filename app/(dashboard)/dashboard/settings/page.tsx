@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { 
   CreditCard, Sparkles, Check, ArrowRight, Loader2, CheckCircle2, 
@@ -12,7 +12,7 @@ import { ensureUserProfile } from "@/utils/ensure-profile";
 import { createCheckoutSession, verifyCheckoutSession, applyMockUpgrade } from "@/app/actions/stripe";
 import { cn } from "@/utils/cn";
 
-export default function SettingsPage() {
+function SettingsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -666,5 +666,17 @@ export default function SettingsPage() {
       )}
 
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={
+      <div className="h-[80vh] flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
+      </div>
+    }>
+      <SettingsPageContent />
+    </Suspense>
   );
 }
