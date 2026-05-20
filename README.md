@@ -4,6 +4,8 @@ An advanced, premium SaaS platform that enables users to design custom AI Influe
 
 Built with **Next.js 16 (App Router)**, **React 19**, **Supabase Database & Storage**, **Tailwind CSS v4**, **Stripe Subscription Gateway**, and the **Zernio Social API**.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fshrutisania11%2Fai-influencer-generator&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,LUMA_AGENTS_API_KEY,ENABLE_MOCK_GENERATION,FAL_KEY,ZERNIO_API_KEY,NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,STRIPE_SECRET_KEY,STRIPE_WEBHOOK_SECRET)
+
 ---
 
 ## 🚀 Key Features
