@@ -135,7 +135,7 @@ CREATE TABLE public.social_accounts (
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/ai-influencer-generator.git
+git clone https://github.com/shrutisania11/ai-influencer-generator.git
 cd ai-influencer-generator
 ```
 
